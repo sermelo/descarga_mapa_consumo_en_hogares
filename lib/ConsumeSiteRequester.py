@@ -36,11 +36,11 @@ class ConsumeSiteRequester(object):
             except NoSuchElementException as err:
                 print("NoSuchElementException error: {0}".format(err))
                 print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
-                sleep(30)
+                sleep(300)
             except ElementClickInterceptedException as err:
                 print("ElementClickInterceptedException error: {0}".format(err))
                 print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
-                sleep(30)
+                sleep(300)
         return data
             
     def __request_data(self, category, period, region):
@@ -83,7 +83,6 @@ class ConsumeSiteRequester(object):
                         registry[fields[c]] = data.text
                     c += 1
                 registries.append(registry)
-        # print("Data saved: {0}".format(registries))
         return registries
 
     def __numerify(self, string):

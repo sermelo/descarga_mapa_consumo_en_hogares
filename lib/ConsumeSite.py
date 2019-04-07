@@ -33,7 +33,7 @@ class ConsumeSite(object):
 
     def __generate_combinations(self, url):
         options = Options()
-        #options.add_argument('--headless')
+        options.add_argument('--headless')
         self.driver = webdriver.Firefox(options=options)
         self.driver.get(url)
 
