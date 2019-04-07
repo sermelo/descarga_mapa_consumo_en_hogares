@@ -13,30 +13,47 @@ class ConsumeSite(object):
     PERIOD_FIELD = "periodo"
     REGION_FIELD = "CCAA"
 
-    def __init__(self, url, input_file = None, output_file = None):
+    def __init__(self):
         options = Options()
         options.add_argument('--headless')
-        self.url = url
         self.driver = webdriver.Firefox(options=options)
-        self.driver.get(url)
 
     def __del__(self):
         self.driver.quit()
 
-    def get_data(self):
-        combinations_data = {"url": self.url}
-        combinations_data["requests"] = self.__generate_combinations()
+    def get_data(self, url = None, input_file = None):
+        if url == None and input_file == None:
+            print("Needs a Url or an input file")
+            exit(1)
+        elif url != None:
+            combinations_data = self.__generate_combinations(url)
 
-        combinations_file_name = "combinations_{0}_{1}".format(self.url.split("/")[-1], uuid.uuid4().hex)
-        with io.open(combinations_file_name, 'w', encoding='utf8') as json_file:
-            json.dump(combinations_data, json_file, ensure_ascii=False)
-        print("Combinations written to file: {0}".format(combinations_file_name))
+            input_file = "combinations_{0}_{1}".format(url.split("/")[-1], uuid.uuid4().hex)
+            with io.open(input_file, 'w', encoding='utf8') as json_file:
+                json.dump(combinations_data, json_file, ensure_ascii=False)
+            print("Combinations written to file: {0}".format(input_file))
 
-        data = self.__request_all_data(combinations_file_name)
+        
+        data = self.__request_all_data(input_file)
         print("The generated data has {0} registries".format(len(data)))
         return data
 
-    def __get_product_categories(self):
+    def __generate_combinations(self, url):
+        self.driver.get(url)
+
+        categories = self.__get_categories()
+        periods = self.__get_periods()
+        regions = self.__get_regions()
+        print("There are {0} categories, {1} periods and {2} regions what makes a total of {3} requests".format(len(categories), len(periods), len(regions), len(categories) * len(periods) * len(regions)))
+
+        combinations_data = {"url": url, "requests": []}
+        for category in categories:
+            for period in periods:
+                for region in regions:
+                    combinations_data["requests"].append({"done": False, "category": category, "period": period, "region": region})
+        return combinations_data
+
+    def __get_categories(self):
         return self.__get_selector_options(self.CATEGORY_FIELD)
 
     def __get_periods(self):
@@ -53,20 +70,7 @@ class ConsumeSite(object):
                 continue
             options.append(option.text)
         return options
-
-    def __generate_combinations(self):
-        categories = self.__get_product_categories()
-        periods = self.__get_periods()
-        regions = self.__get_regions()
-        print("There are {0} categories, {1} periods and {2} regions what makes a total of {3} requests".format(len(categories), len(periods), len(regions), len(categories) * len(periods) * len(regions)))
-
-        combinations = []
-        for category in categories:
-            for period in periods:
-                for region in regions:
-                    combinations.append({"done": False, "category": category, "period": period, "region": region})
-        return combinations
-
+    
     def __request_all_data(self, combinations_file):
         with open(combinations_file, 'r') as json_file:
             combinations = json.load(json_file)
