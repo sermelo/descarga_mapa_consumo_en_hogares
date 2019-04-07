@@ -46,7 +46,7 @@ class ConsumeSiteRequester(object):
 
         with io.open(self.input_file, 'w', encoding='utf8') as json_file:
             json.dump(combinations, json_file, ensure_ascii=False)
-            print("Combinations written to file: {0}".format(input_file))
+            print("Combinations written to file: {0}".format(self.input_file))
         return data
             
     def __request_data(self, category, period, region):
