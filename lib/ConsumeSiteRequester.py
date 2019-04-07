@@ -29,6 +29,8 @@ class ConsumeSiteRequester(object):
 
         data = []
         for combination in combinations["requests"]:
+            if combination["done"] == True:
+                continue
             print("Options to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
             try:
                 data.extend(self.__request_data(combination["category"], combination["period"], combination["region"]))
@@ -36,11 +38,13 @@ class ConsumeSiteRequester(object):
             except NoSuchElementException as err:
                 print("NoSuchElementException error: {0}".format(err))
                 print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
-                time.sleep(300)
             except ElementClickInterceptedException as err:
                 print("ElementClickInterceptedException error: {0}".format(err))
                 print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
-                time.sleep(300)
+
+        with io.open(self.input_file, 'w', encoding='utf8') as json_file:
+            json.dump(combinations, json_file, ensure_ascii=False)
+            print("Combinations written to file: {0}".format(input_file))
         return data
             
     def __request_data(self, category, period, region):
