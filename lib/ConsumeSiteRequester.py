@@ -28,7 +28,12 @@ class ConsumeSiteRequester(object):
 
         print("Number of requests to do: {0}".format(len(combinations["requests"])))
 
-        data, combinations = self.__request_combinations(self, combinations)
+        data = []
+        while True:
+            new_data, combinations = self.__request_combinations(combinations)
+            data.extend(new_data)
+            if len(new_data) == 0:
+                break
 
         with io.open(self.input_file, 'w', encoding='utf8') as json_file:
             json.dump(combinations, json_file, ensure_ascii=False)
@@ -64,10 +69,8 @@ class ConsumeSiteRequester(object):
              "Región": region,}
         
         self.driver.find_element_by_name("boton1").click()
-        time.sleep(0.5)
         parsed_data = self.__parse_data(self.driver.find_element_by_xpath("/html/body/div/div/div[1]/div[2]/div/div[2]/div/div[13]/div/table[2]/tbody"))
         self.driver.back()
-        time.sleep(0.5)
         
         for registry in parsed_data:
             registry.update(aditional_data)
