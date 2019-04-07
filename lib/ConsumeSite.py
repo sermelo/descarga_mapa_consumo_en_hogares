@@ -5,7 +5,6 @@ import uuid
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.select import Select
-from selenium.common.exceptions.NoSuchElementException:
 from lib.ConsumeSiteRequester import ConsumeSiteRequester
 
 class ConsumeSite(object):
