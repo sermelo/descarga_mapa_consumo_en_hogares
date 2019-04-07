@@ -6,16 +6,16 @@ alimentación del gobierno de España
 
 Portal: https://www.mapa.gob.es/app/consumo-en-hogares/consulta.asp
 
-#Requirements
+# Requisitos
 
-## Load virtualenv
+## Cargar virtualenv
 ```
 source env/bin/activate
 ```
 
-## Install Geckodriver
+## Instalar Geckodriver
 
-Gecko driver should be in the PATH.
-More information:
+Se debe installar Geckover driver en el PATH del usuario:
+Más información:
   https://github.com/SeleniumHQ/selenium/blob/master/py/docs/source/index.rst
 
