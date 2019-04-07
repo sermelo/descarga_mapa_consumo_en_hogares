@@ -101,6 +101,6 @@ class ConsumeSite(object):
         string = string.replace(".", "")
         string = string.replace(",", ".")
         if string == "":
-            string = "0"
+            return None
         return float(string)
         
