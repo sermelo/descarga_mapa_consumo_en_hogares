@@ -1,5 +1,6 @@
 import time
 import json
+import io
 import uuid
 
 from selenium import webdriver
