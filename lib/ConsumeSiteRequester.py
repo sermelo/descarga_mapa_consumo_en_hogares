@@ -26,10 +26,19 @@ class ConsumeSiteRequester(object):
         with open(self.input_file, 'r') as json_file:
             combinations = json.load(json_file)
 
-        self.driver.get(combinations["url"])
-
-        data = []
         print("Number of requests to do: {0}".format(len(combinations["requests"])))
+
+        data, combinations = self.__request_combinations(self, combinations)
+
+        with io.open(self.input_file, 'w', encoding='utf8') as json_file:
+            json.dump(combinations, json_file, ensure_ascii=False)
+            print("Combinations written to file: {0}".format(self.input_file))
+
+        return data
+
+    def __request_combinations(self, combinations):
+        self.driver.get(combinations["url"])
+        data = []
         for combination in combinations["requests"]:
             if combination["done"] == True:
                 continue
@@ -43,12 +52,8 @@ class ConsumeSiteRequester(object):
             except ElementClickInterceptedException as err:
                 print("ElementClickInterceptedException error: {0}".format(err))
                 print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
+        return data, combinations
 
-        with io.open(self.input_file, 'w', encoding='utf8') as json_file:
-            json.dump(combinations, json_file, ensure_ascii=False)
-            print("Combinations written to file: {0}".format(self.input_file))
-        return data
-            
     def __request_data(self, category, period, region):
         data = []
         self.__select_options({self.CATEGORY_FIELD: category, self.PERIOD_FIELD: period, self.REGION_FIELD: region})
