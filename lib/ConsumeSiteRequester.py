@@ -13,8 +13,7 @@ class ConsumeSiteRequester(object):
     PERIOD_FIELD = "periodo"
     REGION_FIELD = "CCAA"
 
-    def __init__(self, input_file):
-        self.input_file = input_file
+    def __init__(self):
         options = Options()
         options.add_argument('--headless')
         self.driver = webdriver.Firefox(options=options)
@@ -22,8 +21,8 @@ class ConsumeSiteRequester(object):
     def __del__(self):
         self.driver.quit()
 
-    def process_file(self):
-        with open(self.input_file, 'r') as json_file:
+    def process_file(self, input_file):
+        with open(input_file, 'r') as json_file:
             combinations = json.load(json_file)
         print("Number of requests to do: {0}".format(len(combinations["requests"])))
         data = self.__request_combinations(combinations)

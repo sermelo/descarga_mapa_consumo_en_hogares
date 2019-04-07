@@ -25,8 +25,8 @@ class ConsumeSite(object):
                 json.dump(combinations_data, json_file, ensure_ascii=False)
             print("Combinations written to file: {0}".format(input_file))
 
-        requester = ConsumeSiteRequester(input_file)
-        data = requester.process_file()
+        requester = ConsumeSiteRequester()
+        data = requester.process_file(input_file)
         print("The generated data has {0} registries".format(len(data)))
         return data
 
