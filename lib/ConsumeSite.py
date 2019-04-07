@@ -1,5 +1,8 @@
 import time
-  
+import io
+import json
+import uuid
+
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.select import Select
@@ -13,6 +16,7 @@ class ConsumeSite(object):
     def __init__(self, url, input_file = None, output_file = None):
         options = Options()
         options.add_argument('--headless')
+        self.url = url
         self.driver = webdriver.Firefox(options=options)
         self.driver.get(url)
 
@@ -20,11 +24,15 @@ class ConsumeSite(object):
         self.driver.quit()
 
     def get_data(self):
-        categories = self.__get_product_categories()
-        periods = self.__get_periods()
-        regions = self.__get_regions()
-        print("There are {0} categories, {1} periods and {2} regions what makes a total of {3} requests".format(len(categories), len(periods), len(regions), len(categories) * len(periods) * len(regions)))
-        data = self.__request_all_data(categories, periods, regions)
+        combinations_data = {"url": self.url}
+        combinations_data["requests"] = self.__generate_combinations()
+
+        combinations_file_name = "combinations_{0}_{1}".format(self.url.split("/")[-1], uuid.uuid4().hex)
+        with io.open(combinations_file_name, 'w', encoding='utf8') as json_file:
+            json.dump(combinations_data, json_file, ensure_ascii=False)
+        print("Combinations written to file: {0}".format(combinations_file_name))
+
+        data = self.__request_all_data(combinations_file_name)
         print("The generated data has {0} registries".format(len(data)))
         return data
 
@@ -45,14 +53,29 @@ class ConsumeSite(object):
                 continue
             options.append(option.text)
         return options
-    
-    def __request_all_data(self, categories, periods, regions):
-        data = [] 
+
+    def __generate_combinations(self):
+        categories = self.__get_product_categories()
+        periods = self.__get_periods()
+        regions = self.__get_regions()
+        print("There are {0} categories, {1} periods and {2} regions what makes a total of {3} requests".format(len(categories), len(periods), len(regions), len(categories) * len(periods) * len(regions)))
+
+        combinations = []
         for category in categories:
             for period in periods:
                 for region in regions:
-                    print("Options to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(category, period, region))
-                    data.extend(self.__request_data(category, period, region))
+                    combinations.append({"done": False, "category": category, "period": period, "region": region})
+        return combinations
+
+    def __request_all_data(self, combinations_file):
+        with open(combinations_file, 'r') as json_file:
+            combinations = json.load(json_file)
+        self.driver.get(combinations["url"])
+        data = []
+        for combination in combinations["requests"]:
+            print("Options to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
+            data.extend(self.__request_data(combination["category"], combination["period"], combination["region"]))
+            combination["done"] = True
         return data
     
     def __select_options(self, options):
