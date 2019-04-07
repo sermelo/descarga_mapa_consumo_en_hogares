@@ -16,7 +16,7 @@ class ConsumeSiteRequester(object):
     def __init__(self, input_file):
         self.input_file = input_file
         options = Options()
-        #options.add_argument('--headless')
+        options.add_argument('--headless')
         self.driver = webdriver.Firefox(options=options)
 
     def __del__(self):
