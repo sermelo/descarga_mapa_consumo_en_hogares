@@ -36,7 +36,7 @@ class ConsumeSiteRequester(object):
         while len(pending_combinations) > 0:
             failed_combinations = []
             for combination in pending_combinations:
-                print("Options to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
+                print("{0} Options to request: \n Category: {1}\n Period: {2}\n Region: {3}".format(time.strftime("%d %H:%M:%S"), combination["category"], combination["period"], combination["region"]))
                 try:
                     data.extend(self.__request_data(combination["category"], combination["period"], combination["region"]))
                     combination["done"] = True
