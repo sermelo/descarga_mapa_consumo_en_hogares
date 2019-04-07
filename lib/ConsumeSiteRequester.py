@@ -28,6 +28,7 @@ class ConsumeSiteRequester(object):
         self.driver.get(combinations["url"])
 
         data = []
+        print("Number of requests to do: {0}".format(len(combinations["requests"])))
         for combination in combinations["requests"]:
             if combination["done"] == True:
                 continue
