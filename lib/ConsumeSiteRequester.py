@@ -69,8 +69,8 @@ class ConsumeSiteRequester(object):
         self.__select_options({self.CATEGORY_FIELD: category, self.PERIOD_FIELD: period, self.REGION_FIELD: region})
         aditional_data = \
             {"Categoría": category,
-             "Mes": period.split("/")[0],
-             "Año": period.split("/")[1],
+             "Mes": period.replace(" - ", "/").split("/")[0],
+             "Año": period.replace(" - ", "/").split("/")[1],
              "Región": region,}
         self.driver.find_element_by_name("boton1").click()
         parsed_data = self.__parse_data(self.driver.find_element_by_xpath(self.TABLE_XPATH))
