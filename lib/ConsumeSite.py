@@ -13,22 +13,17 @@ class ConsumeSite(object):
     PERIOD_FIELD = "periodo"
     REGION_FIELD = "CCAA"
 
-    def get_data(self, url = None, input_file = None):
-        if url == None and input_file == None:
-            print("Needs a Url or an input file")
-            exit(1)
-        elif url != None:
-            combinations_data = self.__generate_combinations(url)
+    def get_data(self, url, output_file):
 
-            input_file = "combinations_{0}_{1}".format(url.split("/")[-1], uuid.uuid4().hex)
-            with io.open(input_file, 'w', encoding='utf8') as json_file:
-                json.dump(combinations_data, json_file, ensure_ascii=False)
-            print("Combinations written to file: {0}".format(input_file))
+        combinations_data = self.__generate_combinations(url)
+
+        input_file = "combinations_{0}_{1}".format(url.split("/")[-1], uuid.uuid4().hex)
+        with io.open(input_file, 'w', encoding='utf8') as json_file:
+            json.dump(combinations_data, json_file, ensure_ascii=False)
+        print("Combinations written to file: {0}".format(input_file))
 
         requester = ConsumeSiteRequester()
-        data = requester.process_file(input_file)
-        print("The generated data has {0} registries".format(len(data)))
-        return data
+        requester.process_file(input_file, output_file)
 
     def __generate_combinations(self, url):
         options = Options()
