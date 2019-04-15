@@ -12,6 +12,7 @@ class ConsumeSiteRequester(object):
     CATEGORY_FIELD = "grupo"
     PERIOD_FIELD = "periodo"
     REGION_FIELD = "CCAA"
+    TABLE_XPATH = "/html/body/div/div/div[1]/div[2]/div/div[2]/div/div[13]/div/table[2]/tbody"
 
     def __init__(self):
         options = Options()
@@ -71,9 +72,8 @@ class ConsumeSiteRequester(object):
              "Mes": period.split("/")[0],
              "Año": period.split("/")[1],
              "Región": region,}
-
         self.driver.find_element_by_name("boton1").click()
-        parsed_data = self.__parse_data(self.driver.find_element_by_xpath("/html/body/div/div/div[1]/div[2]/div/div[2]/div/div[13]/div/table[2]/tbody"))
+        parsed_data = self.__parse_data(self.driver.find_element_by_xpath(self.TABLE_XPATH))
         for registry in parsed_data:
             registry.update(aditional_data)
             data.append(registry)
