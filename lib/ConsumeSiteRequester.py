@@ -58,7 +58,7 @@ class ConsumeSiteRequester(object):
                     print("NoSuchElementException error: {0}".format(err))
                     print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
                     failed_combinations.append(combination)
-                    time.sleep(60)
+                    time.sleep(20)
             print("Failed combinations: {0}".format(failed_combinations))
             pending_combinations = failed_combinations
         f.close()
