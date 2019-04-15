@@ -12,6 +12,7 @@ class ConsumeSiteRequester(object):
     CATEGORY_FIELD = "grupo"
     PERIOD_FIELD = "periodo"
     REGION_FIELD = "CCAA"
+    TABLE_XPATH = "/html/body/div/div/div[1]/div[2]/div/div[2]/div/div[13]/div/table[2]/tbody"
 
     def __init__(self):
         options = Options()
@@ -58,7 +59,7 @@ class ConsumeSiteRequester(object):
                     print("NoSuchElementException error: {0}".format(err))
                     print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
                     failed_combinations.append(combination)
-                    time.sleep(60)
+                    time.sleep(20)
             print("Failed combinations: {0}".format(failed_combinations))
             pending_combinations = failed_combinations
         f.close()
@@ -68,12 +69,11 @@ class ConsumeSiteRequester(object):
         self.__select_options({self.CATEGORY_FIELD: category, self.PERIOD_FIELD: period, self.REGION_FIELD: region})
         aditional_data = \
             {"Categoría": category,
-             "Mes": period.split("/")[0],
-             "Año": period.split("/")[1],
+             "Mes": period.replace(" - ", "/").split("/")[0],
+             "Año": period.replace(" - ", "/").split("/")[1],
              "Región": region,}
-
         self.driver.find_element_by_name("boton1").click()
-        parsed_data = self.__parse_data(self.driver.find_element_by_xpath("/html/body/div/div/div[1]/div[2]/div/div[2]/div/div[13]/div/table[2]/tbody"))
+        parsed_data = self.__parse_data(self.driver.find_element_by_xpath(self.TABLE_XPATH))
         for registry in parsed_data:
             registry.update(aditional_data)
             data.append(registry)
