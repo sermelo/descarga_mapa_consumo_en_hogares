@@ -41,6 +41,7 @@ class ConsumeSiteRequester(object):
             for combination in pending_combinations:
                 c += 1
                 print(str(c))
+                # Requests get slower over time so the driver is rebooted every 20 requests
                 if c == 20:
                     c = 0
                     self.driver.close()
