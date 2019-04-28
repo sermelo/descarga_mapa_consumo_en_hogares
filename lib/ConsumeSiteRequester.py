@@ -4,6 +4,9 @@ import io
 import uuid
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException, UnexpectedTagNameException
@@ -79,7 +82,6 @@ class ConsumeSiteRequester(object):
     def __request_data(self, category, period, region):
         data = []
         self.__select_options({self.CATEGORY_FIELD: category, self.PERIOD_FIELD: period, self.REGION_FIELD: region})
-
         if "/" in period: 
             month = period.split("/")[0]
             year = period.split("/")[1]
@@ -92,7 +94,11 @@ class ConsumeSiteRequester(object):
              "Año": year,
              "Región": region,}
         self.driver.find_element_by_name("boton1").click()
-        parsed_data = self.__parse_data(self.driver.find_element_by_xpath(self.TABLE_XPATH))
+        data_table = WebDriverWait(self.driver, 10).until(
+          EC.presence_of_element_located((By.XPATH, self.TABLE_XPATH))
+        )
+        data_table = self.driver.find_element_by_xpath(self.TABLE_XPATH)
+        parsed_data = self.__parse_data(data_table)
         for registry in parsed_data:
             registry.update(aditional_data)
             data.append(registry)
