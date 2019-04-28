@@ -49,22 +49,27 @@ class ConsumeSiteRequester(object):
         self.driver = webdriver.Firefox(options=options)
         self.driver.get(combinations["url"])
 
+        max_requests = 75
+        requests_done = 0
+
         pending_combinations = combinations["requests"]
         f = open(output_file, 'w')
         while len(pending_combinations) > 0:
-
             start_request_time = time.time()
             failed_combinations = []
             for combination in pending_combinations:
                 duration_time = time.time() - start_request_time
                 print("Have pass {0} sends since previous request".format(duration_time))
                 # If previous request took too much time
-                if (duration_time) > 8:
+                if (duration_time) > 60 or requests_done > max_requests:
                     print("Restarting the driver")
                     self.driver.close()
                     self.driver = webdriver.Firefox(options=options)
+                    requests_done = 0
 
                 start_request_time = time.time()
+                requests_done += 1
+
                 try:
                     self.driver.get(combinations["url"])
                     print("Options to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
