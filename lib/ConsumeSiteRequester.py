@@ -14,6 +14,20 @@ class ConsumeSiteRequester(object):
     REGION_FIELD = "CCAA"
     TABLE_XPATH = "/html/body/div/div/div[1]/div[2]/div/div[2]/div/div[13]/div/table[2]/tbody"
 
+    m = {
+        'Enero': 1,
+        'Febrero': 2,
+        'Marzo': 3,
+        'Abril': 4,
+        'Mayo': 5,
+        'Junio': 6,
+        'Julio': 7,
+        'Agosto': 8,
+        'Septiembre': 9,
+        'Octubre': 10,
+        'Noviembre': 11,
+        'Diciembre': 12,
+        }
     def __init__(self):
         options = Options()
         options.add_argument('--headless')
@@ -76,7 +90,7 @@ class ConsumeSiteRequester(object):
             year = period.split(" - ")[0]
         aditional_data = \
             {"Categoría": category,
-             "Mes": month,
+             "Mes": self.m[month],
              "Año": year,
              "Región": region,}
         self.driver.find_element_by_name("boton1").click()
