@@ -51,30 +51,32 @@ class ConsumeSiteRequester(object):
 
         pending_combinations = combinations["requests"]
         f = open(output_file, 'w')
-        c = 0
         while len(pending_combinations) > 0:
+
+            start_request_time = time.time()
             failed_combinations = []
             for combination in pending_combinations:
-                c += 1
-                print(str(c))
-                # Requests get slower over time so the driver is rebooted every 20 requests
-                if c == 20:
-                    c = 0
+                duration_time = time.time() - start_request_time
+                print("Have pass {0} sends since previous request".format(duration_time))
+                # If previous request took too much time
+                if (duration_time) > 15:
+                    print("Restarting the driver")
                     self.driver.close()
-                    print("Closing the driver")
                     self.driver = webdriver.Firefox(options=options)
+
+                start_request_time = time.time()
                 try:
                     self.driver.get(combinations["url"])
-                    print("{0} Options to request: \n Category: {1}\n Period: {2}\n Region: {3}".format(time.strftime("%d %H:%M:%S"), combination["category"], combination["period"], combination["region"]))
+                    print("Options to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
                     data = self.__request_data(combination["category"], combination["period"], combination["region"])
                     f.write(str(json.dumps(data, ensure_ascii=False)))
                     f.write("\n")
                     combination["done"] = True
                 except Exception as err:
-                    print("NoSuchElementException error: {0}".format(err))
+                    print("Error: {0}".format(err))
                     print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
                     failed_combinations.append(combination)
-                    time.sleep(20)
+                    time.sleep(10) # Wait some second, in case it is a network problem
             print("Failed combinations: {0}".format(failed_combinations))
             pending_combinations = failed_combinations
         f.close()
