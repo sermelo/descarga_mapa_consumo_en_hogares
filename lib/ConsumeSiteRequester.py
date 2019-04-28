@@ -59,7 +59,7 @@ class ConsumeSiteRequester(object):
                 duration_time = time.time() - start_request_time
                 print("Have pass {0} sends since previous request".format(duration_time))
                 # If previous request took too much time
-                if (duration_time) > 15:
+                if (duration_time) > 8:
                     print("Restarting the driver")
                     self.driver.close()
                     self.driver = webdriver.Firefox(options=options)
