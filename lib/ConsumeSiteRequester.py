@@ -29,8 +29,6 @@ class ConsumeSiteRequester(object):
         'Diciembre': 12,
         }
     def __init__(self):
-        options = Options()
-        options.add_argument('--headless')
         self.driver = None
 
     def __del__(self):
