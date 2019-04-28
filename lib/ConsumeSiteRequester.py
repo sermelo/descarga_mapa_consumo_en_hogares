@@ -86,10 +86,10 @@ class ConsumeSiteRequester(object):
         self.__select_options({self.CATEGORY_FIELD: category, self.PERIOD_FIELD: period, self.REGION_FIELD: region})
         if "/" in period: 
             month = period.split("/")[0]
-            year = period.split("/")[1]
+            year = int(period.split("/")[1])
         else:
             month = period.split(" - ")[1]
-            year = period.split(" - ")[0]
+            year = int(period.split(" - ")[0])
         aditional_data = \
             {"Categoría": category,
              "Mes": self.m[month],
