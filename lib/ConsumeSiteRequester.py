@@ -60,8 +60,11 @@ class ConsumeSiteRequester(object):
             for combination in pending_combinations:
                 duration_time = time.time() - start_request_time
                 print("Have pass {0} sends since previous request".format(duration_time))
-                # If previous request took too much time
-                if (duration_time) > 60 or requests_done > max_requests:
+
+                # The memory usage and request responce increase over tie so:
+                # If previous request took too much time or already have done 20 requests
+                # TODO Stablish a parameter using both requests_done and duration_time to know better when to restart the driver
+                if ((duration_time) > 20 and requests_done > 5) or requests_done > max_requests:
                     print("Restarting the driver")
                     self.driver.close()
                     self.driver = webdriver.Firefox(options=options)
