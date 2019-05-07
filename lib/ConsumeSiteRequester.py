@@ -4,6 +4,9 @@ import io
 import uuid
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException, UnexpectedTagNameException
@@ -14,9 +17,21 @@ class ConsumeSiteRequester(object):
     REGION_FIELD = "CCAA"
     TABLE_XPATH = "/html/body/div/div/div[1]/div[2]/div/div[2]/div/div[13]/div/table[2]/tbody"
 
+    m = {
+        'Enero': 1,
+        'Febrero': 2,
+        'Marzo': 3,
+        'Abril': 4,
+        'Mayo': 5,
+        'Junio': 6,
+        'Julio': 7,
+        'Agosto': 8,
+        'Septiembre': 9,
+        'Octubre': 10,
+        'Noviembre': 11,
+        'Diciembre': 12,
+        }
     def __init__(self):
-        options = Options()
-        options.add_argument('--headless')
         self.driver = None
 
     def __del__(self):
@@ -34,32 +49,42 @@ class ConsumeSiteRequester(object):
         self.driver = webdriver.Firefox(options=options)
         self.driver.get(combinations["url"])
 
+        max_requests = 75
+        requests_done = 0
+
         pending_combinations = combinations["requests"]
         f = open(output_file, 'w')
-        c = 0
         while len(pending_combinations) > 0:
+            start_request_time = time.time()
             failed_combinations = []
             for combination in pending_combinations:
-                c += 1
-                print(str(c))
-                # Requests get slower over time so the driver is rebooted every 20 requests
-                if c == 20:
-                    c = 0
+                duration_time = time.time() - start_request_time
+                print("Have pass {0} sends since previous request".format(duration_time))
+
+                # The memory usage and request responce increase over tie so:
+                # If previous request took too much time or already have done 20 requests
+                # TODO Stablish a parameter using both requests_done and duration_time to know better when to restart the driver
+                if ((duration_time) > 20 and requests_done > 5) or requests_done > max_requests:
+                    print("Restarting the driver")
                     self.driver.close()
-                    print("Closing the driver")
                     self.driver = webdriver.Firefox(options=options)
+                    requests_done = 0
+
+                start_request_time = time.time()
+                requests_done += 1
+
                 try:
                     self.driver.get(combinations["url"])
-                    print("{0} Options to request: \n Category: {1}\n Period: {2}\n Region: {3}".format(time.strftime("%d %H:%M:%S"), combination["category"], combination["period"], combination["region"]))
+                    print("Options to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
                     data = self.__request_data(combination["category"], combination["period"], combination["region"])
                     f.write(str(json.dumps(data, ensure_ascii=False)))
                     f.write("\n")
                     combination["done"] = True
                 except Exception as err:
-                    print("NoSuchElementException error: {0}".format(err))
+                    print("Error: {0}".format(err))
                     print("Failed to request: \n Category: {0}\n Period: {1}\n Region: {2}".format(combination["category"], combination["period"], combination["region"]))
                     failed_combinations.append(combination)
-                    time.sleep(20)
+                    time.sleep(10) # Wait some second, in case it is a network problem
             print("Failed combinations: {0}".format(failed_combinations))
             pending_combinations = failed_combinations
         f.close()
@@ -67,13 +92,23 @@ class ConsumeSiteRequester(object):
     def __request_data(self, category, period, region):
         data = []
         self.__select_options({self.CATEGORY_FIELD: category, self.PERIOD_FIELD: period, self.REGION_FIELD: region})
+        if "/" in period: 
+            month = period.split("/")[0]
+            year = int(period.split("/")[1])
+        else:
+            month = period.split(" - ")[1]
+            year = int(period.split(" - ")[0])
         aditional_data = \
             {"Categoría": category,
-             "Mes": period.replace(" - ", "/").split("/")[0],
-             "Año": period.replace(" - ", "/").split("/")[1],
+             "Mes": self.m[month],
+             "Año": year,
              "Región": region,}
         self.driver.find_element_by_name("boton1").click()
-        parsed_data = self.__parse_data(self.driver.find_element_by_xpath(self.TABLE_XPATH))
+        data_table = WebDriverWait(self.driver, 10).until(
+          EC.presence_of_element_located((By.XPATH, self.TABLE_XPATH))
+        )
+        data_table = self.driver.find_element_by_xpath(self.TABLE_XPATH)
+        parsed_data = self.__parse_data(data_table)
         for registry in parsed_data:
             registry.update(aditional_data)
             data.append(registry)
