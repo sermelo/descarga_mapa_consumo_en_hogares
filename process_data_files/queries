@@ -1,0 +1,6 @@
+db.test3.aggregate([{$group: {"_id":{"Año": "$Año"}}}])
+
+db.test3.aggregate([{"$group": {"_id": {categoria: "$Categoría", producto: "$Producto"}}}])
+
+mongo tfm --quiet --eval 'DBQuery.shellBatchSize = 2000; db.test3.aggregate([{"$group": {"_id": {categoria: "$Categoría", producto: "$Producto"}}}])' > data.json
+
