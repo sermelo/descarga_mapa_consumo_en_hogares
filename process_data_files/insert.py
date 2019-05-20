@@ -49,14 +49,17 @@ product_name_replacement = {
     "Zumos y néctares resto": "Zumo y néctar otros",
     "Zumo fruta refrigerado/exp.": "Zumo refrigerado/exprimido fruta",
     "Zumo conentrado piña y mezclas": "Zumo concentrado piña y mezclas",
-    }
+}
 
 category_name_replacement = {
     "Bolleria/Pastelería/Galletas/Cereales": "Bollería/Pastelería/Galletas/Cereales",
     "Zumo de frutas": "Zumos",
     "Vinos y bebidas alcohólicas": "Vinos, otras bebidas alcohólicas y vinagres",
-    }
+}
 
+region_name_replacement = {
+    "Castilla León": "Castilla y León",
+}
 
 def insert_files_data(directory):
     for file_name in glob.glob("data/*.json".format(directory)):
@@ -79,6 +82,7 @@ def insert_file(file_name):
 def parse_document(document):
     document["Producto"] = parse_product(document["Producto"])
     document["Categoría"] = parse_category(document["Categoría"])
+    document["Región"] = parse_region(document["Región"])
 
     # The 2004 "Total zumo y néctar" is in the wrong category
     if document["Producto"] == "Total zumo y néctar":
@@ -99,5 +103,11 @@ def parse_category(category_name):
     if new_category_name in category_name_replacement:
         new_category_name = category_name_replacement[new_category_name]
     return new_category_name
+
+def parse_region(region_name):
+    new_region_name = region_name
+    if new_region_name in region_name_replacement:
+        new_region_name = region_name_replacement[new_region_name]
+    return new_region_name
 
 insert_files_data("data")
