@@ -83,10 +83,10 @@ def parse_document(document):
     document["Producto"] = parse_product(document["Producto"])
     document["Categoría"] = parse_category(document["Categoría"])
     document["Región"] = parse_region(document["Región"])
-
     # The 2004 "Total zumo y néctar" is in the wrong category
     if document["Producto"] == "Total zumo y néctar":
         document["Categoría"] = "Zumos"
+    document = transform_units(document)
     return document
 
 def parse_product(product_name):
@@ -109,5 +109,20 @@ def parse_region(region_name):
     if new_region_name in region_name_replacement:
         new_region_name = region_name_replacement[new_region_name]
     return new_region_name
+
+def transform_units(document):
+    new_document = {}
+    columns_without_changes = ["Producto", "Categoría", "Mes", "Año", "Región", "Penetración (%)", "Consumo per capita", "Gasto per capita"]
+    for field in columns_without_changes:
+        new_document[field] = document[field]
+
+    new_document["Valor"] = document["Valor (miles de €)"] * 1000
+    if "unidades" in document["Producto"]:
+        new_document["Unidades"] = document["Volumen (miles de kg)"] * 1000
+        new_document["Precio medio unidad"] = document["Precio medio kg"]
+    else:
+        new_document["Masa"] = document["Volumen (miles de kg)"] * 1000
+        new_document["Precio medio kg"] = document["Precio medio kg"]
+    return new_document
 
 insert_files_data("data")
