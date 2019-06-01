@@ -49,6 +49,7 @@ product_name_replacement = {
     "Zumos y néctares resto": "Zumo y néctar otros",
     "Zumo fruta refrigerado/exp.": "Zumo refrigerado/exprimido fruta",
     "Zumo conentrado piña y mezclas": "Zumo concentrado piña y mezclas",
+    "Cervezas": "Cerveza",
 }
 
 category_name_replacement = {
