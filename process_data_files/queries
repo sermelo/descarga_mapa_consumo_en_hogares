@@ -4,3 +4,7 @@ db.test3.aggregate([{"$group": {"_id": {categoria: "$Categoría", producto: "$Pr
 
 mongo tfm --quiet --eval 'DBQuery.shellBatchSize = 2000; db.test3.aggregate([{"$group": {"_id": {categoria: "$Categoría", producto: "$Producto"}}}])' > data.json
 
+db.test3.aggregate([{"$match": {"Producto": "Cerveza"}},{"$group": { _id: {producto: "$Producto", region: "$Región", ano: "$Año"}, masaAnual: {$sum: "$Masa"}, count: { $sum: 1 } }}])
+
+db.test3.aggregate([{"$match": {"Producto": "Cerveza"}},{"$group": { _id: {producto: "$Producto", region: "$Región"}, masaAnual: {$sum: "$Masa"}, count: { $sum: 1 } }}])
+
